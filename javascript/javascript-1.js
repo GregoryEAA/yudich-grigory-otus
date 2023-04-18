@@ -1,19 +1,18 @@
-let totalSum = 0;
-const sum = (...arr) => {
-    const currentSum = arr.reduce((a, b) => {
-        return a + (+b || 0);
-    }, 0);
-
-    totalSum += currentSum;
-
-    if(arr.length === 0) {
-        return totalSum;
+function sum(args) {
+    if (typeof valueOf == "function") {
+        valueOf = 0;
     }
 
-    return currentSum;
-};
+    if (args !== undefined) {
+        valueOf += args;
+        return sum;
+    } else {
+        return valueOf;
+    }
+}
 
-
-console.log(sum(2, 2, 4, 1)); // 9
-console.log(sum(1, 2, 3, -4, 6)); // 8
-console.log(sum()); // 17
+sum(1)(2); // 3
+sum(3); // 6
+console.log(sum(-2)(0)(1)()); // 5
+sum(-2)(3); // 6
+console.log(sum()); // 6
