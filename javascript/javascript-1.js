@@ -1,18 +1,23 @@
-function sum(args) {
-    if (typeof valueOf == "function") {
-        valueOf = 0;
-    }
-
-    if (args !== undefined) {
-        valueOf += args;
-        return sum;
-    } else {
-        return valueOf;
+function crtSum() {
+    let sumAllArg = 0
+    return function(arg) {
+        if (typeof arg == "number") {
+            return function(args) {
+                if (args) {
+                    return sum(arg + args)
+                }
+                sumAllArg += arg
+                return arg
+            }
+        } else {
+            return sumAllArg
+        }
     }
 }
 
-sum(1)(2); // 3
-sum(3); // 6
-console.log(sum(-2)(0)(1)()); // 5
-sum(-2)(3); // 6
-console.log(sum()); // 6
+const sum = crtSum()
+
+console.log(sum(1)(2)()); // 3
+console.log(sum(3)()); // 3
+console.log(sum(-2)(1)()); // -1
+console.log(sum()); // 5
