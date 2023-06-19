@@ -11,7 +11,8 @@ async function tree(dirPath) {
         const entries = await fs.readdir(currentPath, { withFileTypes: true });
 
         for (const entry of entries) {
-            const entryPath = path.join(currentPath, entry.name);
+            let entryPath = path.join(currentPath, entry.name);
+            entryPath = entryPath.replace(/\\/g, '/');
 
             if (entry.isDirectory()) {
                 result.dirs.push(entryPath);
