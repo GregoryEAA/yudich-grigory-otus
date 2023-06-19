@@ -1,0 +1,7 @@
+{
+  "name": "tree-script",
+  "version": "1.0.0",
+  "scripts": {
+    "tree": "node tree.js"
+  }
+}
