@@ -7,58 +7,49 @@
   <title>CustomElements HW</title>
 </head>
 <script>
-  const json = `{
-                "id": 1,
-                "items": [{
-                    "id": 2,
-                    "items": [{ "id": 3 }]
-                }, {
-                "id": 4,
-                "items": [
-                    { "id": 5,
-                    "items": [ {"id": 6 }]
-                    },
-                    { "id": 7}
-                    ]
-                }]
-            }`;
+  const jsonData = {
+    "id": 1,
+    "items": [
+      {
+        "id": 2,
+        "items": [{ "id": 3 }]
+      },
+      {
+        "id": 4,
+        "items": [
+          {
+            "id": 5,
+            "items": [ {"id": 6 }]
+          },
+          { "id": 7}
+        ]
+      }
+    ]
+  };
 
   class MyRoot extends HTMLElement {
     constructor() {
       super();
       this.attachShadow({mode: 'open'});
-      this.json = json;
-      const treeObj = JSON.parse(this.json);
-      function showTreeRec(tree, parentId) {
-        // debugger;
-        let parentNode, parentLevel;
-        if (parentId === -1) {
-          parentNode = this.shadowRoot;
-          parentLevel = 0;
-        } else {
-          parentNode = this.shadowRoot.getElementById(parentId);
-          parentLevel = parseInt(parentNode.getAttribute('level'));
-        }
-        let child;
-        if (tree.items) {
-          child = document.createElement('my-tree');
-        } else {
-          child = document.createElement('my-leaf');
-        }
-        child.setAttribute('id', tree.id);
-        child.setAttribute('level', parentLevel + 1);
-        const childTextDiv = child.shadowRoot.querySelector('.name');
-        childTextDiv.innerText += ' id=' + tree.id;
-        childTextDiv.style.paddingLeft = parentLevel * 10 + 'px';
-        parentNode.appendChild(child);
-        if (tree.items) {
-          tree.items.forEach((node) => {
-            showTreeRec.call(this, node, tree.id);
-          });
-        }
-      }
+      this.json = JSON.stringify(jsonData);
+      this.showTreeRec(JSON.parse(this.json), -1);
+    }
 
-      showTreeRec.call(this, treeObj, -1);
+    showTreeRec(tree, parentId) {
+      let parentNode = parentId === -1 ? this.shadowRoot : this.shadowRoot.getElementById(parentId);
+      let parentLevel = parentId === -1 ? 0 : parseInt(parentNode.getAttribute('level'));
+      let child = document.createElement(tree.items ? 'my-tree' : 'my-leaf');
+      child.setAttribute('id', tree.id);
+      child.setAttribute('level', parentLevel + 1);
+      const childTextDiv = child.shadowRoot.querySelector('.name');
+      childTextDiv.innerText += ' id=' + tree.id;
+      childTextDiv.style.paddingLeft = parentLevel * 10 + 'px';
+      parentNode.appendChild(child);
+      if (tree.items) {
+        tree.items.forEach((node) => {
+          this.showTreeRec(node, tree.id);
+        });
+      }
     }
   }
   customElements.define('my-root', MyRoot);
@@ -89,7 +80,7 @@
 <template id="tree">
   <style>
     .text {
-      color:brown;
+      color:red;
     }
   </style>
   <div class="text name">Tree</div>
