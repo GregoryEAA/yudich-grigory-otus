@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CustomElements HW</title>
+</head>
+<script>
+  const jsonData = {
+    "id": 1,
+    "items": [
+      {
+        "id": 2,
+        "items": [{ "id": 3 }]
+      },
+      {
+        "id": 4,
+        "items": [
+          {
+            "id": 5,
+            "items": [ {"id": 6 }]
+          },
+          { "id": 7}
+        ]
+      }
+    ]
+  };
+
+  class MyRoot extends HTMLElement {
+    constructor() {
+      super();
+      this.attachShadow({mode: 'open'});
+      this.json = JSON.stringify(jsonData);
+      this.showTreeRec(JSON.parse(this.json), -1);
+    }
+
+    showTreeRec(tree, parentId) {
+      let parentNode = parentId === -1 ? this.shadowRoot : this.shadowRoot.getElementById(parentId);
+      let parentLevel = parentId === -1 ? 0 : parseInt(parentNode.getAttribute('level'));
+      let child = document.createElement(tree.items ? 'my-tree' : 'my-leaf');
+      child.setAttribute('id', tree.id);
+      child.setAttribute('level', parentLevel + 1);
+      const childTextDiv = child.shadowRoot.querySelector('.name');
+      childTextDiv.innerText += ' id=' + tree.id;
+      childTextDiv.style.paddingLeft = parentLevel * 10 + 'px';
+      parentNode.appendChild(child);
+      if (tree.items) {
+        tree.items.forEach((node) => {
+          this.showTreeRec(node, tree.id);
+        });
+      }
+    }
+  }
+  customElements.define('my-root', MyRoot);
+
+  class MyTree extends HTMLElement {
+    constructor() {
+      super();
+      this.attachShadow({mode: 'open'});
+      const template = document.getElementById('tree');
+      const node = document.importNode(template.content, true);
+      this.shadowRoot.appendChild(node);
+    }
+  }
+  customElements.define('my-tree', MyTree);
+
+  class MyLeaf extends HTMLElement {
+    constructor() {
+      super();
+      this.attachShadow({mode: 'open'});
+      const template = document.getElementById('leaf');
+      const node = document.importNode(template.content, true);
+      this.shadowRoot.appendChild(node);
+    }
+  }
+  customElements.define('my-leaf', MyLeaf);
+</script>
+<body>
+<template id="tree">
+  <style>
+    .text {
+      color:red;
+    }
+  </style>
+  <div class="text name">Tree</div>
+  <slot></slot>
+</template>
+<template id="leaf">
+  <style>
+    .text {
+      color:green;
+    }
+  </style>
+  <div class="text name">Leaf</div>
+</template>
+
+<div id="my-root">
+  <my-root></my-root>
+</div>
+</body>
+</html>
